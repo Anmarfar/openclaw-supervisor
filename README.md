@@ -1,49 +1,56 @@
 # OpenClaw Supervisor
 
-OpenClaw Supervisor gives OpenClaw a controlled multi-worker execution path with deterministic arbitration and durable run artifacts.
+Important tasks should not disappear into a single opaque worker turn.
 
-Instead of treating important tasks as a single opaque model turn, this plugin gives the operator a bounded lane where worker fanout, retry behavior, verification behavior, and final run artifacts are explicit and inspectable.
+This repository packages a controlled supervisor path for OpenClaw: one or more worker attempts, deterministic arbitration, bounded retry, optional verification on flagged runs, and durable artifacts the operator can inspect after the fact.
 
 ```text
-caller -> supervisor_run -> worker fanout -> arbitration -> durable artifacts
+caller
+  -> supervisor_run
+    -> worker fanout
+      -> arbitration
+        -> events.jsonl + final.json
 ```
 
-The result is a safer operational path for supervised work inside OpenClaw:
+The goal is simple:
 
-- one or more worker attempts
-- deterministic outcome selection
-- bounded retry behavior
-- optional verification on flagged single-worker runs
-- durable `events.jsonl` and `final.json` artifacts for later inspection
+- keep supervised execution explicit
+- keep outcomes deterministic
+- keep artifacts inspectable
+- keep rollout controlled
+
+The workflow stays on your machine, inside your OpenClaw environment, under operator control.
 
 ## Warning
 
-This repository is for controlled, operator-reviewed deployment.
+This is an operator-controlled production component, not a broad autonomous default.
 
-- Do not enable this as broad autonomous default behavior without validating your own rollout path.
-- Do not expose bearer tokens, gateway secrets, or local machine secrets in docs, scripts, shell history, or tickets.
-- Preserve compatibility-bound identifiers unless you are intentionally planning and validating a migration.
-- Use the included rollback path before making unrelated live-node changes during an incident.
-- Treat this as an operational system, not just a code drop. Config, scripts, docs, and runtime behavior must stay aligned.
+- Do not enable it widely until you have validated your own rollout path.
+- Do not expose bearer tokens, gateway secrets, or machine-local secrets in docs, shell history, logs, or tickets.
+- Do not casually rename compatibility-bound runtime identifiers.
+- Use the rollback path before making speculative live-node changes during an incident.
+- Keep the README, manifest, scripts, and active docs aligned. Drift here becomes operational risk.
 
 ## For the Operator
 
-Use OpenClaw Supervisor when you want a task to run through a controlled execution path rather than a single unchecked worker turn.
+You want a safer execution lane for important work inside OpenClaw.
 
-This is useful when you want:
+This gives you that lane.
 
-- durable run evidence on disk
-- deterministic arbitration across multiple worker outputs
+Instead of one unchecked worker output, you get:
+
+- controlled fanout when needed
+- deterministic arbitration
 - bounded retry on weak output or worker error
-- a verification worker for flagged single-worker cases
-- a safer rollout lane for supervised tasks on a live node
+- optional verification on flagged single-worker runs
+- durable artifacts under `~/.openclaw/supervisor/runs/<runId>/`
 
-What changes after installation:
+What changes after install:
 
 - OpenClaw exposes `supervisor_run`
 - OpenClaw exposes `supervisor_status`
-- each run writes artifacts under `~/.openclaw/supervisor/runs/<runId>/`
-- the operator gets a repeatable smoke-test and rollback path
+- each supervised run writes inspectable artifacts
+- the operator has a repeatable verify / smoke-test / rollback path
 
 Commands you will actually use:
 
@@ -64,11 +71,12 @@ systemctl --user restart openclaw-gateway.service
 
 Short practical workflow:
 
-1. Install the plugin into the OpenClaw plugin directory.
-2. Merge the config block from `openclaw.json.example`.
+1. Install the plugin files.
+2. Merge the config block.
 3. Enable the plugin and restart the gateway.
-4. Run verification and the smoke test.
-5. Use `supervisor_run` only through the controlled/operator-reviewed lane unless you have validated broader use.
+4. Verify the install.
+5. Run the smoke test.
+6. Use the supervisor lane only where you want bounded, inspectable execution.
 
 ## How It Works
 
@@ -78,56 +86,62 @@ caller
     -> one or more worker attempts
       -> retry on weak output or worker error
         -> optional verification worker on flagged single-worker runs
-          -> arbitration
-            -> events.jsonl + final.json
+          -> deterministic arbitration
+            -> final status + durable artifacts
               -> supervisor_status / operator inspection
 ```
 
-At runtime, the plugin does four things:
+At runtime, the supervisor does four jobs:
 
-1. Chooses a worker plan.
-   Normal tasks can use a single worker or fan out to multiple workers depending on config and the request.
+1. It plans worker execution.
+   The request and config determine whether the run stays single-worker or fans out.
 
-2. Runs bounded attempts.
-   Workers can be retried within configured limits if they error or return weak output.
+2. It runs bounded attempts.
+   A worker can retry within configured limits if it errors or returns weak output.
 
-3. Computes a deterministic decision.
-   Arbitration ranks candidate results deterministically and produces a stable selected outcome.
+3. It computes a deterministic result.
+   Arbitration compares candidate outputs and selects a stable outcome in a repeatable way.
 
-4. Writes inspectable artifacts.
-   Every run produces append-first event history plus a final decision artifact so the operator can inspect what happened after the fact.
+4. It writes durable evidence.
+   Each run produces `events.jsonl` and `final.json`, so the operator can inspect what happened without guessing.
 
-This is designed for operational clarity. The point is not just to get an answer. The point is to make the execution path bounded, inspectable, and replayable enough for controlled production use.
+This is not just about getting an answer. It is about getting an answer through a path the operator can verify and trust.
 
 ## Prerequisites
 
-- A working OpenClaw installation.
-- A running gateway service, typically `openclaw-gateway.service` in the user systemd session.
-- Access to the OpenClaw plugin path, typically `~/.openclaw/workspace/.openclaw/plugins/`.
-- Access to the OpenClaw state root, typically `~/.openclaw/`.
-- Shell tools used by the included scripts: `bash`, `cp`, `mkdir`, `python3`, and optionally `systemctl`.
-- A local OpenClaw config that can supply the gateway auth token from `~/.openclaw/openclaw.json` for smoke-test execution.
+- A working OpenClaw installation
+- A running user gateway service, typically `openclaw-gateway.service`
+- Access to the OpenClaw plugin directory
+- Access to the OpenClaw state root, typically `~/.openclaw`
+- Shell tools used by the included scripts: `bash`, `cp`, `mkdir`, `python3`, and optionally `systemctl`
+- A local OpenClaw config that can supply the gateway bearer token for smoke testing
 
 ## Installation (for Operator or Agent)
 
-This section is intentionally step-by-step and copy-pastable. It can be handed to Codex or Claude directly.
+You can hand this section directly to Codex or Claude.
 
-Follow these steps exactly. Do not improvise paths. Do not rename compatibility-bound identifiers such as `supervisor-phase1`, `supervisor_run`, `supervisor_status`, `events.jsonl`, or `final.json`.
+Follow these steps exactly. Do not improvise paths, rename compatibility-bound identifiers, or substitute different runtime ids.
 
-### 1. Install the plugin files
+### 1. Choose the repo path
+
+Clone or place this repository somewhere local, then enter it:
 
 ```bash
-cd /home/z2/repos/openclaw-supervisor
+cd /path/to/openclaw-supervisor
+```
+
+### 2. Install the plugin files
+
+```bash
 PLUGIN_TARGET_DIR="$HOME/.openclaw/workspace/.openclaw/plugins/supervisor-phase1" \
 ./scripts/install-plugin.sh
 ```
 
 This copies only the deployable runtime files into the live plugin directory.
 
-### 2. Print and review the example config
+### 3. Print and review the config block
 
 ```bash
-cd /home/z2/repos/openclaw-supervisor
 ./scripts/print-config-example.sh
 ```
 
@@ -137,36 +151,34 @@ The full example is also available at:
 
 Merge the `plugins.entries.supervisor-phase1` block into your real OpenClaw config.
 
-### 3. Enable the plugin entry
+### 4. Enable the plugin entry
 
 ```bash
 openclaw config set plugins.entries.supervisor-phase1.enabled true
 openclaw config set plugins.entries.supervisor-phase1.config.gateEnabled true
 ```
 
-If you are not ready to route real work through the plugin yet, keep `gateEnabled=false` and stop after installation.
+If you are installing ahead of time but not ready to use the lane yet, keep `gateEnabled=false`.
 
-### 4. Restart the gateway
+### 5. Restart the gateway
 
 ```bash
 systemctl --user restart openclaw-gateway.service
 ```
 
-### 5. Verify the install
+### 6. Verify the install
 
 ```bash
-cd /home/z2/repos/openclaw-supervisor
 ./scripts/verify-install.sh
 ```
 
-### 6. Run the smoke test
+### 7. Run the smoke test
 
 ```bash
-cd /home/z2/repos/openclaw-supervisor
 ./scripts/run-smoke-test.sh
 ```
 
-If the smoke test cannot auto-acquire the local gateway token, see:
+If the smoke test cannot auto-acquire the local gateway token, start with:
 
 - [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 
@@ -175,7 +187,6 @@ If the smoke test cannot auto-acquire the local gateway token, see:
 Run both validation scripts after installation:
 
 ```bash
-cd /home/z2/repos/openclaw-supervisor
 ./scripts/verify-install.sh
 ./scripts/run-smoke-test.sh
 ```
@@ -210,12 +221,12 @@ Expected on-disk artifacts after a successful smoke test:
 - `~/.openclaw/supervisor/runs/<runId>/events.jsonl`
 - `~/.openclaw/supervisor/runs/<runId>/final.json`
 
-If the smoke test fails:
+If validation fails:
 
-1. do not start broad debugging changes immediately
+1. stop changing unrelated settings
 2. inspect the first failing prerequisite
 3. use `docs/TROUBLESHOOTING.md`
-4. use `./scripts/rollback-plugin.sh` if the node is live and you need to restore safe state
+4. if the node is live and you need to restore safe state, run `./scripts/rollback-plugin.sh`
 
 ## Usage
 
@@ -283,7 +294,7 @@ with urllib.request.urlopen(req) as response:
 PY
 ```
 
-In routine use, the operator should prefer:
+In normal supervised use, the operator should prefer:
 
 - `supervisor_run` for controlled execution
 - `supervisor_status` for quick state inspection
@@ -299,13 +310,13 @@ Supported options:
 
 | Option | Type | Default | Description |
 |---|---|---:|---|
-| `gateEnabled` | boolean | `false` | Enables runtime use when no env override is forcing the gate off. |
-| `gateEnvVar` | string | `OPENCLAW_SUPERVISOR_ENABLED` | Optional env override that can force the gate on or off. |
-| `defaultFanout` | `single` or `multi` | `single` | Default worker strategy for normal tasks. |
-| `highImportanceFanout` | `single` or `multi` | `multi` | Worker strategy for tasks marked `high`. |
-| `maxRetriesPerWorker` | integer | `1` | Maximum retry count per worker when output is weak or the worker errors. |
-| `verificationOnFlaggedCases` | boolean | `true` | Enables a verification worker on flagged single-worker runs. |
-| `maxVerificationWorkers` | integer | `1` | Maximum number of verification workers. |
+| `gateEnabled` | boolean | `false` | Enables runtime use when no env override is forcing the gate off |
+| `gateEnvVar` | string | `OPENCLAW_SUPERVISOR_ENABLED` | Env override that can force the gate on or off |
+| `defaultFanout` | `single` or `multi` | `single` | Default worker strategy for normal tasks |
+| `highImportanceFanout` | `single` or `multi` | `multi` | Worker strategy for tasks marked `high` |
+| `maxRetriesPerWorker` | integer | `1` | Maximum retry count per worker on weak output or worker error |
+| `verificationOnFlaggedCases` | boolean | `true` | Enables a verification worker on flagged single-worker runs |
+| `maxVerificationWorkers` | integer | `1` | Maximum number of verification workers |
 
 Full example config block:
 
@@ -388,7 +399,6 @@ Upgrade flow:
 Rollback flow:
 
 ```bash
-cd /home/z2/repos/openclaw-supervisor
 ./scripts/rollback-plugin.sh
 ```
 
@@ -449,10 +459,10 @@ Further detail:
 
 ## Disclaimer
 
-- No secrets are included in this repository.
-- All example tokens and config values are placeholders.
-- Operators must review config and rollout impact before enabling this plugin on a live environment.
-- This repository provides a controlled operational path, not an unconditional guarantee of correct model behavior.
-- If you deploy it on a live node, the responsibility for rollout scope, validation, and incident handling remains with the operator.
+Files in this repo are clean. No secrets, no embedded credentials, no committed token values, no silent surprises.
 
-Use it deliberately. Validate it on your own lane. Broaden only when you have the evidence to do so safely.
+Beyond that, this is operational knowledge, not a managed service.
+
+Supervisor logic can be correct and still produce an answer you do not want. Models drift. Gateways fail. Artifacts can reveal problems after the fact, but they do not remove operator responsibility.
+
+Use this deliberately. Validate it on your own lane. Broaden only when you have the evidence to do so safely.
