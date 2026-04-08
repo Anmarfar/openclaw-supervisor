@@ -1,0 +1,54 @@
+{
+  "id": "supervisor-phase1",
+  "name": "supervisor-phase1",
+  "displayName": "OpenClaw Supervisor",
+  "version": "1.0.0",
+  "description": "Multi-worker run orchestration with deterministic arbitration, durable event logs, and verification-on-demand.",
+  "category": "tools",
+  "configSchema": {
+    "type": "object",
+    "properties": {
+      "gateEnabled": {
+        "type": "boolean",
+        "default": false
+      },
+      "gateEnvVar": {
+        "type": "string",
+        "default": "OPENCLAW_SUPERVISOR_ENABLED"
+      },
+      "defaultFanout": {
+        "type": "string",
+        "enum": [
+          "single",
+          "multi"
+        ],
+        "default": "single"
+      },
+      "highImportanceFanout": {
+        "type": "string",
+        "enum": [
+          "single",
+          "multi"
+        ],
+        "default": "multi"
+      },
+      "maxRetriesPerWorker": {
+        "type": "integer",
+        "default": 1,
+        "minimum": 0,
+        "maximum": 1
+      },
+      "verificationOnFlaggedCases": {
+        "type": "boolean",
+        "default": true
+      },
+      "maxVerificationWorkers": {
+        "type": "integer",
+        "default": 1,
+        "minimum": 0,
+        "maximum": 1
+      }
+    },
+    "additionalProperties": false
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "plugins": {
+    "entries": {
+      "supervisor-phase1": {
+        "enabled": false,
+        "config": {
+          "gateEnabled": false,
+          "gateEnvVar": "OPENCLAW_SUPERVISOR_ENABLED",
+          "defaultFanout": "single",
+          "highImportanceFanout": "multi",
+          "maxRetriesPerWorker": 1,
+          "verificationOnFlaggedCases": true,
+          "maxVerificationWorkers": 1
+        }
+      }
+    }
+  }
+}

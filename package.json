@@ -1,0 +1,23 @@
+{
+  "name": "@openclaw/supervisor",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "description": "Multi-worker run orchestration with deterministic arbitration and durable decision artifacts for OpenClaw.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/z2/openclaw-supervisor"
+  },
+  "openclaw": {
+    "extensions": [
+      "index.js"
+    ]
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "license": "MIT",
+  "peerDependencies": {
+    "openclaw": ">=1.0.0"
+  }
+}
