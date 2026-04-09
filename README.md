@@ -148,6 +148,8 @@ openclaw config set plugins.entries.supervisor.config.gateEnabled true
 
 If you are installing ahead of time but are not ready to route real work yet, keep `gateEnabled=false`.
 
+This config path is the normal way to control the supervisor lane. Use the environment override only as an exceptional operator override.
+
 ### 3. Restart and verify
 
 ```bash
@@ -214,7 +216,7 @@ The plugin reads from `plugins.entries.supervisor.config`:
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `gateEnabled` | boolean | `false` | Enables runtime use |
-| `gateEnvVar` | string | `OPENCLAW_SUPERVISOR_ENABLED` | Env override to force gate on or off |
+| `gateEnvVar` | string | `OPENCLAW_SUPERVISOR_ENABLED` | Optional emergency override; normal gate control should stay in config |
 | `defaultFanout` | `single` or `multi` | `single` | Worker strategy for normal tasks |
 | `highImportanceFanout` | `single` or `multi` | `multi` | Worker strategy for high-importance tasks |
 | `maxRetriesPerWorker` | integer | `1` | Max retries per worker on weak output or error |
@@ -313,6 +315,19 @@ openclaw config get plugins.entries.supervisor.enabled
 - `scripts/` — install, verify, smoke test, rollback, config helpers
 - `__tests__/` — test suite
 - `docs/` — operator, troubleshooting, architecture docs
+
+---
+
+## Warning
+
+This is an operator-controlled production component, not a broad autonomous default.
+
+- Do not enable it widely until you have validated your own rollout path.
+- Use configuration as the normal gate path. Treat the environment override as exceptional operator control.
+- Do not expose bearer tokens, gateway secrets, or machine-local secrets in docs, shell history, logs, or tickets.
+- Do not casually rename runtime contract identifiers.
+- Use the rollback path before making speculative live-node changes during an incident.
+- Keep the README, manifest, scripts, and active docs aligned. Drift here becomes operational risk.
 
 ---
 

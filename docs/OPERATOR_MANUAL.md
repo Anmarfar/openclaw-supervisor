@@ -29,6 +29,8 @@ openclaw config set plugins.entries.supervisor.enabled true
 openclaw config set plugins.entries.supervisor.config.gateEnabled true
 ```
 
+Use configuration as the normal gate path. Keep the environment override for exceptional operator control only.
+
 4. Restart the gateway.
 
 ```bash
@@ -39,7 +41,6 @@ systemctl --user restart openclaw-gateway.service
 
 ```bash
 ./scripts/verify-install.sh
-export OPENCLAW_GATEWAY_TOKEN="set-a-local-token-here"
 ./scripts/run-smoke-test.sh
 ```
 
