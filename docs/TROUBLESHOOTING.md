@@ -57,7 +57,7 @@ Rollback threshold: Roll back if you cannot explain the gate behavior on a live 
 
 Symptom: Tool invocation returns 401, 403, or an auth-related client error.
 
-Likely cause: Missing or wrong gateway bearer token. The gateway uses `auth.mode=token` and the required token is the shared gateway token stored in `~/.openclaw/openclaw.json` at `gateway.auth.token`, NOT the device-auth token at `~/.openclaw/identity/device-auth.json`.
+Likely cause: Missing or wrong gateway bearer token.
 
 Exact checks:
 
@@ -66,18 +66,7 @@ printf '%s\n' "${OPENCLAW_GATEWAY_TOKEN:-unset}"
 openclaw config get gateway.auth 2>&1 | grep mode
 ```
 
-Exact fix: Acquire and export the gateway token from config directly.
-
-```bash
-export OPENCLAW_GATEWAY_TOKEN=$(python3 -c "
-import json
-d = json.load(open('$HOME/.openclaw/openclaw.json'))
-print(d['gateway']['auth']['token'])
-")
-./scripts/run-smoke-test.sh
-```
-
-The smoke-test script automatically attempts this acquisition. If the script still prints `set OPENCLAW_GATEWAY_TOKEN ...`, the config key is missing or the config file is not at the default path — inspect `~/.openclaw/openclaw.json` manually.
+Exact fix: Use the same local gateway token your OpenClaw node expects for tool invocation. The smoke-test script attempts to acquire it automatically from the standard local config. If that does not work in your environment, export `OPENCLAW_GATEWAY_TOKEN` manually and rerun `./scripts/run-smoke-test.sh`.
 
 Do not print the token value in logs or tickets.
 
@@ -87,23 +76,19 @@ Rollback threshold: Roll back only if 401 errors started immediately after this 
 
 Symptom: `./scripts/run-smoke-test.sh` exits with the message `set OPENCLAW_GATEWAY_TOKEN to a valid local gateway bearer token before running the smoke test`.
 
-Likely cause: Neither the `OPENCLAW_GATEWAY_TOKEN` env var is set, nor was the auto-acquisition from `~/.openclaw/openclaw.json` successful.
+Likely cause: Neither the `OPENCLAW_GATEWAY_TOKEN` env var is set, nor was the automatic local token acquisition successful.
 
 Exact checks:
 
 ```bash
 printf '%s\n' "${OPENCLAW_GATEWAY_TOKEN:-unset}"
-python3 -c "import json; d=json.load(open('$HOME/.openclaw/openclaw.json')); print(d.get('gateway',{}).get('auth',{}).get('mode','missing'))"
+openclaw config get gateway.auth 2>&1 | grep mode
 ```
 
-Exact fix:
+Exact fix: Export a valid local gateway token for your node, then rerun the smoke test.
 
 ```bash
-export OPENCLAW_GATEWAY_TOKEN=$(python3 -c "
-import json
-d = json.load(open('$HOME/.openclaw/openclaw.json'))
-print(d['gateway']['auth']['token'])
-")
+export OPENCLAW_GATEWAY_TOKEN="your-local-token"
 ./scripts/run-smoke-test.sh
 ```
 
