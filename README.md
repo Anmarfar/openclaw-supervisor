@@ -97,6 +97,45 @@ The point is not just to get an answer. It is to get it through a path you can v
 
 ---
 
+## Quick Examples
+
+**Routine** - fast, single worker:
+
+> "Summarise the last 5 changelog entries and flag any breaking changes."
+
+```bash
+supervisor_run task="Summarise the last 5 changelog entries and flag any breaking changes." importanceLevel=low runId="changelog-001"
+# Result: Fast-track
+```
+
+**Standard** - production check with retry:
+
+> "Is this config change safe to apply to the live node?"
+
+```bash
+supervisor_run task="Review this config change for risks before I apply it to the live node." importanceLevel=medium runId="config-review-001"
+# Result: Verified
+```
+
+**Critical** - multiple workers, arbitration, full record on disk:
+
+> "What are the top risks in this deployment plan?"
+
+```bash
+supervisor_run task="Analyse this deployment plan. Top 3 risks ranked by severity." importanceLevel=high runId="deploy-risk-001"
+# Result: Arbitrated
+```
+
+**Check recent runs:**
+
+```bash
+supervisor_status limit=5
+```
+
+Full usage guide: [docs/USAGE_GUIDE.md](docs/USAGE_GUIDE.md)
+
+---
+
 ## Execution Path
 
 > Tool names, artifact filenames, and the plugin id `supervisor` remain stable because deployed configs depend on them. Change them only with a migration plan.
