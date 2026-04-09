@@ -27,7 +27,7 @@ This is an operator-controlled production component, not a broad autonomous defa
 
 - Do not enable it widely until you have validated your own rollout path.
 - Do not expose bearer tokens, gateway secrets, or machine-local secrets in docs, shell history, logs, or tickets.
-- Do not casually rename compatibility-bound runtime identifiers.
+- Do not casually rename runtime contract identifiers.
 - Use the rollback path before making speculative live-node changes during an incident.
 - Keep the README, manifest, scripts, and active docs aligned. Drift here becomes operational risk.
 
@@ -55,13 +55,13 @@ What changes after install:
 Commands you will actually use:
 
 ```bash
-PLUGIN_TARGET_DIR="$HOME/.openclaw/workspace/.openclaw/plugins/supervisor-phase1" \
+PLUGIN_TARGET_DIR="$HOME/.openclaw/workspace/.openclaw/plugins/supervisor" \
 ./scripts/install-plugin.sh
 
 ./scripts/print-config-example.sh
 
-openclaw config set plugins.entries.supervisor-phase1.enabled true
-openclaw config set plugins.entries.supervisor-phase1.config.gateEnabled true
+openclaw config set plugins.entries.supervisor.enabled true
+openclaw config set plugins.entries.supervisor.config.gateEnabled true
 systemctl --user restart openclaw-gateway.service
 
 ./scripts/verify-install.sh
@@ -133,7 +133,7 @@ cd /path/to/openclaw-supervisor
 ### 2. Install the plugin files
 
 ```bash
-PLUGIN_TARGET_DIR="$HOME/.openclaw/workspace/.openclaw/plugins/supervisor-phase1" \
+PLUGIN_TARGET_DIR="$HOME/.openclaw/workspace/.openclaw/plugins/supervisor" \
 ./scripts/install-plugin.sh
 ```
 
@@ -149,13 +149,13 @@ The full example is also available at:
 
 - `openclaw.json.example`
 
-Merge the `plugins.entries.supervisor-phase1` block into your real OpenClaw config.
+Merge the `plugins.entries.supervisor` block into your real OpenClaw config.
 
 ### 4. Enable the plugin entry
 
 ```bash
-openclaw config set plugins.entries.supervisor-phase1.enabled true
-openclaw config set plugins.entries.supervisor-phase1.config.gateEnabled true
+openclaw config set plugins.entries.supervisor.enabled true
+openclaw config set plugins.entries.supervisor.config.gateEnabled true
 ```
 
 If you are installing ahead of time but not ready to use the lane yet, keep `gateEnabled=false`.
@@ -233,7 +233,7 @@ If validation fails:
 Run `supervisor_run` through the gateway:
 
 ```bash
-export OPENCLAW_GATEWAY_TOKEN="set-a-local-token-here"
+export OPENCLAW_GATEWAY_TOKEN=$(python3 -c "import json; d=json.load(open('$HOME/.openclaw/openclaw.json')); print(d['gateway']['auth']['token'])")
 python3 - <<'PY'
 import json
 import os
@@ -267,7 +267,7 @@ PY
 Inspect recent runs with `supervisor_status`:
 
 ```bash
-export OPENCLAW_GATEWAY_TOKEN="set-a-local-token-here"
+export OPENCLAW_GATEWAY_TOKEN=$(python3 -c "import json; d=json.load(open('$HOME/.openclaw/openclaw.json')); print(d['gateway']['auth']['token'])")
 python3 - <<'PY'
 import json
 import os
@@ -304,7 +304,7 @@ In normal supervised use, the operator should prefer:
 
 The plugin reads configuration from:
 
-- `plugins.entries.supervisor-phase1.config`
+- `plugins.entries.supervisor.config`
 
 Supported options:
 
@@ -324,7 +324,7 @@ Full example config block:
 {
   "plugins": {
     "entries": {
-      "supervisor-phase1": {
+      "supervisor": {
         "enabled": false,
         "config": {
           "gateEnabled": false,
@@ -407,8 +407,8 @@ Routine checks:
 ```bash
 ./scripts/verify-install.sh
 systemctl --user is-active openclaw-gateway.service
-openclaw config get plugins.entries.supervisor-phase1.enabled
-openclaw config get plugins.entries.supervisor-phase1.config.gateEnabled
+openclaw config get plugins.entries.supervisor.enabled
+openclaw config get plugins.entries.supervisor.config.gateEnabled
 ```
 
 Use the rollback path before making speculative changes on a live deployment.
@@ -418,8 +418,7 @@ Use the rollback path before making speculative changes on a live deployment.
 Agent guidance:
 
 - Start with the root files; this repo is intentionally flat.
-- Do not casually rename `supervisor-phase1`, the tool names, or artifact filenames.
-- Treat `docs/archive` as historical context, not the primary install path.
+- Do not casually rename `supervisor`, the tool names, or artifact filenames.
 - Keep the README, manifest, scripts, and active docs aligned before claiming a packaging change is complete.
 - Use `supervisor_status`, `events.jsonl`, and `final.json` before guessing about runtime failures.
 - Treat compatibility-bound names as migration-sensitive operational interfaces, not cosmetic naming choices.
@@ -428,8 +427,8 @@ Agent guidance:
 
 The following names remain stable because deployed systems already depend on them:
 
-- Plugin id: `supervisor-phase1`
-- Config path: `plugins.entries.supervisor-phase1.*`
+- Plugin id: `supervisor`
+- Config path: `plugins.entries.supervisor.*`
 - Tool names: `supervisor_run`, `supervisor_status`
 - Artifact filenames: `events.jsonl`, `final.json`
 
@@ -455,7 +454,6 @@ Further detail:
 - `scripts/`: installation, validation, rollback, and config helpers
 - `__tests__/`: test suite
 - `docs/`: operator, troubleshooting, architecture, and compatibility docs
-- `docs/archive/`: archived migration and audit notes
 
 ## Disclaimer
 

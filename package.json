@@ -6,7 +6,7 @@
   "description": "Multi-worker run orchestration with deterministic arbitration and durable decision artifacts for OpenClaw.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/z2/openclaw-supervisor"
+    "url": "https://github.com/Anmarfar/openclaw-supervisor"
   },
   "openclaw": {
     "extensions": [

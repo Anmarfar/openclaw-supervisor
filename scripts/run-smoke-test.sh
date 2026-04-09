@@ -23,8 +23,8 @@ if command -v systemctl >/dev/null 2>&1; then
   fi
 fi
 
-plugin_enabled=$(openclaw config get plugins.entries.supervisor-phase1.enabled 2>/dev/null | awk 'NF{line=$0} END{print line}')
-gate_enabled=$(openclaw config get plugins.entries.supervisor-phase1.config.gateEnabled 2>/dev/null | awk 'NF{line=$0} END{print line}')
+plugin_enabled=$(openclaw config get plugins.entries.supervisor.enabled 2>/dev/null | awk 'NF{line=$0} END{print line}')
+gate_enabled=$(openclaw config get plugins.entries.supervisor.config.gateEnabled 2>/dev/null | awk 'NF{line=$0} END{print line}')
 
 if [[ "$plugin_enabled" != "true" ]]; then
   printf 'plugin is not enabled\n' >&2
@@ -54,7 +54,7 @@ fi
 
 if [[ -z "${OPENCLAW_GATEWAY_TOKEN:-}" ]]; then
   printf 'set OPENCLAW_GATEWAY_TOKEN to a valid local gateway bearer token before running the smoke test\n' >&2
-  printf 'on this node, try: OPENCLAW_GATEWAY_TOKEN=$(python3 -c "import json; d=json.load(open(\"$HOME/.openclaw/openclaw.json\")); print(d[\"gateway\"][\"auth\"][\"token\"])")\n' >&2
+  printf 'example: OPENCLAW_GATEWAY_TOKEN=$(python3 -c "import json; d=json.load(open(\"$HOME/.openclaw/openclaw.json\")); print(d[\"gateway\"][\"auth\"][\"token\"])")\n' >&2
   exit 1
 fi
 

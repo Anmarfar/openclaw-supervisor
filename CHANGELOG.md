@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.1] - 2026-04-09
+
+### Finalization and Safety Pass
+
+- Standardized runtime naming to `supervisor` and `plugins.entries.supervisor.*` across active repo surfaces
+- Removed stale migration archive files and archive directory from published docs surface
+- Tightened publication safety language around token handling and machine-specific disclosure
+- Updated operator and troubleshooting docs to align with current scripts and manifest
+
 ## [1.0.0] - 2026-04-09
 
 ### Initial Release
@@ -46,7 +55,7 @@ This is a clean-room implementation with materially different internal decomposi
 - Added 6 validation tests for new architecture behaviors
 - Added 2 regression tests for edge cases
 
-See [ARCHITECT_NOTES.md](./docs/ARCHITECT_NOTES.md) for design rationale.
+See [ARCHITECTURE.md](./docs/ARCHITECTURE.md) for design rationale.
 
 ---
 

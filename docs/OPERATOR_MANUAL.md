@@ -16,7 +16,7 @@ This manual covers safe operator use of OpenClaw Supervisor in a controlled roll
 1. Install or refresh the plugin files.
 
 ```bash
-PLUGIN_TARGET_DIR="$HOME/.openclaw/workspace/.openclaw/plugins/supervisor-phase1" \
+PLUGIN_TARGET_DIR="$HOME/.openclaw/workspace/.openclaw/plugins/supervisor" \
 ./scripts/install-plugin.sh
 ```
 
@@ -25,8 +25,8 @@ PLUGIN_TARGET_DIR="$HOME/.openclaw/workspace/.openclaw/plugins/supervisor-phase1
 3. Enable the plugin.
 
 ```bash
-openclaw config set plugins.entries.supervisor-phase1.enabled true
-openclaw config set plugins.entries.supervisor-phase1.config.gateEnabled true
+openclaw config set plugins.entries.supervisor.enabled true
+openclaw config set plugins.entries.supervisor.config.gateEnabled true
 ```
 
 4. Restart the gateway.
@@ -54,24 +54,24 @@ Immediate rollback:
 Manual rollback if needed:
 
 ```bash
-openclaw config set plugins.entries.supervisor-phase1.enabled false
-openclaw config set plugins.entries.supervisor-phase1.config.gateEnabled false
+openclaw config set plugins.entries.supervisor.enabled false
+openclaw config set plugins.entries.supervisor.config.gateEnabled false
 systemctl --user restart openclaw-gateway.service
 ```
 
 Verify rollback:
 
 ```bash
-openclaw config get plugins.entries.supervisor-phase1.enabled
-openclaw config get plugins.entries.supervisor-phase1.config.gateEnabled
+openclaw config get plugins.entries.supervisor.enabled
+openclaw config get plugins.entries.supervisor.config.gateEnabled
 systemctl --user is-active openclaw-gateway.service
 ```
 
 ## Health Checks
 
 - `systemctl --user is-active openclaw-gateway.service`
-- `openclaw config get plugins.entries.supervisor-phase1.enabled`
-- `openclaw config get plugins.entries.supervisor-phase1.config.gateEnabled`
+- `openclaw config get plugins.entries.supervisor.enabled`
+- `openclaw config get plugins.entries.supervisor.config.gateEnabled`
 - `./scripts/verify-install.sh`
 - `./scripts/run-smoke-test.sh`
 

@@ -50,8 +50,8 @@ Replay behavior is tolerant of malformed event lines and returns `missing-final`
 
 The following names remain stable because they are runtime contracts:
 
-- `supervisor-phase1` plugin id.
-- `plugins.entries.supervisor-phase1.*` config path.
+- `supervisor` plugin id.
+- `plugins.entries.supervisor.*` config path.
 - `supervisor_run` and `supervisor_status` tool names.
 - `events.jsonl` and `final.json` artifact filenames.
 

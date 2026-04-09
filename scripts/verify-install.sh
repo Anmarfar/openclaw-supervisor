@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 REPO_DIR=${REPO_DIR:-$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)}
-TARGET_DIR=${PLUGIN_TARGET_DIR:-${TARGET_DIR:-"$HOME/.openclaw/workspace/.openclaw/plugins/supervisor-phase1"}}
+TARGET_DIR=${PLUGIN_TARGET_DIR:-${TARGET_DIR:-"$HOME/.openclaw/workspace/.openclaw/plugins/supervisor"}}
 
 required=(openclaw.plugin.json index.js ArbitrationPolicy.js DecisionLogStore.js SupervisorOrchestrator.js package.json)
 
@@ -24,8 +24,8 @@ fi
 printf 'PASS: all required files present in %s\n' "$TARGET_DIR"
 
 if command -v openclaw >/dev/null 2>&1; then
-  plugin_enabled=$(openclaw config get plugins.entries.supervisor-phase1.enabled 2>/dev/null | awk 'NF{line=$0} END{print line}')
-  gate_enabled=$(openclaw config get plugins.entries.supervisor-phase1.config.gateEnabled 2>/dev/null | awk 'NF{line=$0} END{print line}')
+  plugin_enabled=$(openclaw config get plugins.entries.supervisor.enabled 2>/dev/null | awk 'NF{line=$0} END{print line}')
+  gate_enabled=$(openclaw config get plugins.entries.supervisor.config.gateEnabled 2>/dev/null | awk 'NF{line=$0} END{print line}')
 
   if [[ -n "$plugin_enabled" ]]; then
     printf 'plugin enabled state: %s\n' "$plugin_enabled"

@@ -10,7 +10,7 @@ Exact checks:
 
 ```bash
 ./scripts/verify-install.sh
-ls -1 "$HOME/.openclaw/workspace/.openclaw/plugins/supervisor-phase1"
+ls -1 "$HOME/.openclaw/workspace/.openclaw/plugins/supervisor"
 systemctl --user is-active openclaw-gateway.service
 ```
 
@@ -44,12 +44,12 @@ Likely cause: The config gate is still disabled or an env override is forcing th
 Exact checks:
 
 ```bash
-openclaw config get plugins.entries.supervisor-phase1.enabled
-openclaw config get plugins.entries.supervisor-phase1.config.gateEnabled
+openclaw config get plugins.entries.supervisor.enabled
+openclaw config get plugins.entries.supervisor.config.gateEnabled
 printenv OPENCLAW_SUPERVISOR_ENABLED
 ```
 
-Exact fix: Set `plugins.entries.supervisor-phase1.enabled=true`, set `gateEnabled=true`, clear or correct any conflicting env override, and restart the gateway if needed.
+Exact fix: Set `plugins.entries.supervisor.enabled=true`, set `gateEnabled=true`, clear or correct any conflicting env override, and restart the gateway if needed.
 
 Rollback threshold: Roll back if you cannot explain the gate behavior on a live node.
 
@@ -187,8 +187,8 @@ Exact checks:
 ```bash
 ./scripts/verify-install.sh
 systemctl --user is-active openclaw-gateway.service
-openclaw config get plugins.entries.supervisor-phase1.enabled
-openclaw config get plugins.entries.supervisor-phase1.config.gateEnabled
+openclaw config get plugins.entries.supervisor.enabled
+openclaw config get plugins.entries.supervisor.config.gateEnabled
 ```
 
 Exact fix: Resolve the first failing prerequisite, then rerun the smoke test without changing unrelated settings.

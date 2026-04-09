@@ -1,6 +1,6 @@
 {
-  "id": "supervisor-phase1",
-  "name": "supervisor-phase1",
+  "id": "supervisor",
+  "name": "supervisor",
   "displayName": "OpenClaw Supervisor",
   "version": "1.0.0",
   "description": "Multi-worker run orchestration with deterministic arbitration, durable event logs, and verification-on-demand.",

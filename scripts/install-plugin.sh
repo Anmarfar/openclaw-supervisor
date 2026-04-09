@@ -10,7 +10,7 @@ done
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 REPO_DIR=${REPO_DIR:-$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)}
-TARGET_DIR=${PLUGIN_TARGET_DIR:-${TARGET_DIR:-"$HOME/.openclaw/workspace/.openclaw/plugins/supervisor-phase1"}}
+TARGET_DIR=${PLUGIN_TARGET_DIR:-${TARGET_DIR:-"$HOME/.openclaw/workspace/.openclaw/plugins/supervisor"}}
 
 DEPLOY_FILES=(
   index.js

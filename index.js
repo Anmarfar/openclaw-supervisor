@@ -197,13 +197,7 @@ function extractAssistantOutput(messages) {
 }
 
 export default {
-  // Plugin ID is "supervisor-phase1" (not renamed) because existing OpenClaw
-  // deployments depend on this identifier in their config at:
-  //   plugins.entries.supervisor-phase1.*
-  // The repository is named "openclaw-supervisor" reflecting the project's
-  // distinctive identity, but the runtime plugin ID is kept stable for
-  // backward compatibility with deployed systems.
-  id: "supervisor-phase1",
+  id: "supervisor",
   name: "OpenClaw Supervisor",
   register(api) {
     const pluginConfig = getPluginConfig(api);
@@ -241,7 +235,7 @@ export default {
               `gateSource: ${gate.source}`,
               `gateReason: ${gate.reason}`,
               `expectedLogRoot: ${expectedLogRoot}`,
-              `pluginEnabledHint: enable plugins.entries.supervisor-phase1.enabled and set plugins.entries.supervisor-phase1.config.gateEnabled=true or ${pluginConfig.gateEnvVar}=1`,
+              `pluginEnabledHint: enable plugins.entries.supervisor.enabled and set plugins.entries.supervisor.config.gateEnabled=true or ${pluginConfig.gateEnvVar}=1`,
             ].join("\n"),
             {
               effectiveGate: gate.enabled,
@@ -367,7 +361,7 @@ export default {
     api.registerTool(runTool);
     api.registerTool(statusTool);
 
-    api.logger.info("supervisor-phase1 registered");
+    api.logger.info("supervisor registered");
   },
 };
 

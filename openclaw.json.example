@@ -1,7 +1,7 @@
 {
   "plugins": {
     "entries": {
-      "supervisor-phase1": {
+      "supervisor": {
         "enabled": false,
         "config": {
           "gateEnabled": false,
